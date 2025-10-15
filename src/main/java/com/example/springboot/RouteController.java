@@ -17,18 +17,18 @@ public class RouteController {
 	}
 
 	@GetMapping("/getWorkoutPlan")
-	public String getWorkoutPlan() {
-		return "This will eventually get workout plans.";
+	public List<Plan> getWorkoutPlan(@RequestParam int userID) {
+        return planRepository.findByUserId(userID);
+    }
+
+	@PostMapping("/createWorkoutPlan")
+	public Plan createWorkoutPlan(@RequestBody Plan newPlan) {
+		return planRepository.save(newPlan);
 	}
 
-	@GetMapping("/createWorkoutPlan")
-	public String createWorkoutPlan(){
-		return "This will eventually let us add new workout plans to the database.";
-	}
-
-	@GetMapping("/editWorkoutPlan")
-	public String editWorkoutPlan(){
-		return "This will eventually let us edit workout plans";
+	@PutMapping("/editWorkoutPlan")
+	public Plan editWorkoutPlan(@RequestBody Plan editPlan) {
+		return planRepository.save(editPlan);
 	}
 
 	@GetMapping("/getWorkouts")
