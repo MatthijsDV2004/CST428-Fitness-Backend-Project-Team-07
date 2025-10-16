@@ -1,21 +1,68 @@
 package com.example.springboot;
 
+import org.springframework.jdbc.core.RowMapper;
+
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import com.example.springboot.resources.*;
+import org.springframework.web.bind.annotation.*;
+import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
+
+
 
 @RestController
 public class RouteController {
+	@Autowired
+	private PlanRepository planRepository;
 
+	@Autowired
+	private WorkoutRepository workoutRepository;
+
+		
+	/** 
+	 * Default route. We may or may not find a use
+	 * @return nothing
+	*/
 	@GetMapping("/")
 	public String index() {
-		return "This is the basic index route.";
+		return "Greetings from Spring Boot!";
 	}
 
-	@GetMapping("/getUserInfo")
-	public String getUsers() {
-		return "This will eventually do something with Users.";
+	/**
+	 * Return information for a user from the users table.
+	 * @return a User; null if no user found
+	 **/
+	@GetMapping("/getUserById")
+	public DBUser getUserById(@RequestParam(defaultValue = "0") int userid) {
+		DBUser newUser = new DBUser(0,"","","","");
+
+		String sql = "SELECT * FROM Users WHERE UserID = " + userid;
+
+
+    	RowMapper<DBUser> rowMapper = (rs, rowNum) -> new DBUser(
+        	rs.getInt("UserID"),
+        	rs.getString("FirstName"),
+        	rs.getString("LastName"),
+        	rs.getString("Email"),
+        	rs.getString("Password")
+    	);
+
+    	/*try {
+    		DBUser user = jdbcTemplate.queryForObject(sql, rowMapper, userid);
+        	return ResponseEntity.ok(user);
+    	} catch (Exception e) {
+        	return null;
+    	}*/
+		return (newUser);
 	}
 
+	/**
+	 * Return information from the workoutplan table.
+	 * @return an array of strings representing database rows for workout plans
+	 **/
 	@GetMapping("/getWorkoutPlan")
 	public List<Plan> getWorkoutPlan(@RequestParam int userID) {
         return planRepository.findByUserId(userID);
@@ -31,13 +78,33 @@ public class RouteController {
 		return planRepository.save(editPlan);
 	}
 
-	@GetMapping("/getWorkouts")
-	public String getWorkouts(){
-		return "This will eventually let us get a list of possible workouts.";
+	/**
+	 * Remove workout plans from the database.
+	 * @return the number of removed rows, -1 if there's an error
+	 **/
+	@GetMapping("/removeWorkoutPlan")
+	public int removeWorkoutPlan(){
+		return -1; //Error: this hasn't been implemented
 	}
-
+	/**
+	 * Retrieve workouts from the workouts table.
+	 * @return the requested rows
+	 **/
+	@GetMapping("/getWorkouts")
+	public List<Workout> getWorkouts() {
+		try {
+			System.out.println("📢 Fetching workouts...");
+			List<Workout> workouts = workoutRepository.findAll();
+			System.out.println("✅ Workouts fetched: " + workouts.size());
+			return workouts;
+		} catch (Exception e) {
+			System.err.println("❌ ERROR fetching workouts:");
+			e.printStackTrace(); // will print the real reason in the IntelliJ console
+			throw e;
+		}
+	}
 	@GetMapping("/addWorkout")
-	public String addWorkout(){
-		return "This will eventually let us add workouts to the database.";
+	public boolean addWorkout(){
+		return false; //not implemented yet so always returns false
 	}
 }

@@ -1,6 +1,6 @@
 plugins {
 	id 'org.springframework.boot' version '3.3.0'
-	id 'io.spring.dependency-management' version '1.1.0'
+	id 'io.spring.dependency-management' version '1.1.4'
 	id 'java'
 }
 
@@ -17,13 +17,17 @@ repositories {
 }
 
 dependencies {
-	// tag::actuator[]
-	implementation 'org.springframework.boot:spring-boot-starter-actuator'
-	// end::actuator[]
+
 	implementation 'org.springframework.boot:spring-boot-starter-web'
-	// tag::tests[]
-	testImplementation('org.springframework.boot:spring-boot-starter-test')
-	// end::tests[]
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'jakarta.persistence:jakarta.persistence-api:3.1.0'
+
+
+	runtimeOnly 'com.mysql:mysql-connector-j:9.4.0'
+	runtimeOnly 'com.h2database:h2'
+	
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
 test {
