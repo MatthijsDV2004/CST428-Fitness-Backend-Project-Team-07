@@ -1,9 +1,12 @@
 package com.example.springboot;
 
+import org.springframework.jdbc.core.RowMapper;
+
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import com.example.Resources.*;
+import com.example.springboot.resources.*;
 
 @RestController
 public class RouteController {
@@ -14,7 +17,7 @@ public class RouteController {
 	*/
 	@GetMapping("/")
 	public String index() {
-		return "This is the basic index route.";
+		return "Greetings from Spring Boot!";
 	}
 
 	/**
@@ -22,10 +25,26 @@ public class RouteController {
 	 * @return a User; null if no user found
 	 **/
 	@GetMapping("/getUserById")
-	public User getUserById(@RequestParam(defaultValue = "0") int userid) {
-		User newUser = new User(userid,"","","","");
+	public DBUser getUserById(@RequestParam(defaultValue = "0") int userid) {
+		DBUser newUser = new DBUser(0,"","","","");
+
 		String sql = "SELECT * FROM Users WHERE UserID = " + userid;
 
+
+    	RowMapper<DBUser> rowMapper = (rs, rowNum) -> new DBUser(
+        	rs.getInt("UserID"),
+        	rs.getString("FirstName"),
+        	rs.getString("LastName"),
+        	rs.getString("Email"),
+        	rs.getString("Password")
+    	);
+
+    	/*try {
+    		DBUser user = jdbcTemplate.queryForObject(sql, rowMapper, userid);
+        	return ResponseEntity.ok(user);
+    	} catch (Exception e) {
+        	return null;
+    	}*/
 		return (newUser);
 	}
 
@@ -34,7 +53,7 @@ public class RouteController {
 	 * @return an array of strings representing database rows for workout plans
 	 **/
 	@GetMapping("/getWorkoutPlan")
-	public String getWorkoutPlan(int userid) {
+	public String getWorkoutPlan(@RequestParam(name="userid",defaultValue="0")int userid) {
 		String sql = "SELECT * FROM WorkoutPlan WHERE UserID = " + userid;
 		return "This will eventually get workout plans for a user by ID.";
 	}
