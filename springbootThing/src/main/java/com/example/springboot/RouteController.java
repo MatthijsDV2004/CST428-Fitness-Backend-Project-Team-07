@@ -7,7 +7,7 @@ import com.example.Resources.*;
 
 @RestController
 public class RouteController {
-
+		
 	/** 
 	 * Default route. We may or may not find a use
 	 * @return nothing
@@ -25,12 +25,7 @@ public class RouteController {
 	public User getUserById(@RequestParam(defaultValue = "0") int userid) {
 		User newUser = new User(userid,"","","","");
 		String sql = "SELECT * FROM Users WHERE UserID = " + userid;
-		
-		try {
-			
-		} catch (Exception e) {
-			return null;
-		};
+
 		return (newUser);
 	}
 
