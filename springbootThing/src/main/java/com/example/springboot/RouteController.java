@@ -1,7 +1,9 @@
 package com.example.springboot;
 
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import com.example.Resources.*;
 
 @RestController
 public class RouteController {
@@ -15,15 +17,21 @@ public class RouteController {
 		return "This is the basic index route.";
 	}
 
-	@GetMapping("/getUserInfo")
-
 	/**
 	 * Return information for a user from the users table.
-	 * @return an array of strings representing database rows for users
+	 * @return a User; null if no user found
 	 **/
-	@GetMapping("/getUsers")
-	public String getUsers(int id) {
-		return "This will eventually do something with Users.";
+	@GetMapping("/getUserById")
+	public User getUserById(@RequestParam(defaultValue = "0") int userid) {
+		User newUser = new User(userid,"","","","");
+		String sql = "SELECT * FROM Users WHERE UserID = " + userid;
+		
+		try {
+			
+		} catch (Exception e) {
+			return null;
+		};
+		return (newUser);
 	}
 
 	/**
@@ -31,7 +39,8 @@ public class RouteController {
 	 * @return an array of strings representing database rows for workout plans
 	 **/
 	@GetMapping("/getWorkoutPlan")
-	public String getWorkoutPlan() {
+	public String getWorkoutPlan(int userid) {
+		String sql = "SELECT * FROM WorkoutPlan WHERE UserID = " + userid;
 		return "This will eventually get workout plans for a user by ID.";
 	}
 
@@ -40,7 +49,7 @@ public class RouteController {
 	 * @return TRUE if successful, FALSE if there's an issue
 	 **/
 	@GetMapping("/createWorkoutPlan")
-	public boolean createWorkoutPlan(){
+	public boolean createWorkoutPlan(int userid, String arg1, String agr2, String arg3){
 		return false; //There is an issue: this hasn't been implemented yet
 	}
 
@@ -75,7 +84,7 @@ public class RouteController {
 	 * @return TRUE if successful, FALSE if not
 	 **/
 	@GetMapping("/addWorkout")
-	public String addWorkout(){
+	public boolean addWorkout(){
 		return false; //not implemented yet so always returns false
 	}
 }
