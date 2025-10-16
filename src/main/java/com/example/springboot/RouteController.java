@@ -1,10 +1,18 @@
 package com.example.springboot;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
+
+
 
 @RestController
 public class RouteController {
+	@Autowired
+	private PlanRepository planRepository;
+
+	@Autowired
+	private WorkoutRepository workoutRepository;
 
 	@GetMapping("/")
 	public String index() {
@@ -32,10 +40,18 @@ public class RouteController {
 	}
 
 	@GetMapping("/getWorkouts")
-	public String getWorkouts(){
-		return "This will eventually let us get a list of possible workouts.";
+	public List<Workout> getWorkouts() {
+		try {
+			System.out.println("📢 Fetching workouts...");
+			List<Workout> workouts = workoutRepository.findAll();
+			System.out.println("✅ Workouts fetched: " + workouts.size());
+			return workouts;
+		} catch (Exception e) {
+			System.err.println("❌ ERROR fetching workouts:");
+			e.printStackTrace(); // will print the real reason in the IntelliJ console
+			throw e;
+		}
 	}
-
 	@GetMapping("/addWorkout")
 	public String addWorkout(){
 		return "This will eventually let us add workouts to the database.";
