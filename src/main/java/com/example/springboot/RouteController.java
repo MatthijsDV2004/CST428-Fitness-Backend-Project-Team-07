@@ -7,9 +7,20 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.example.springboot.resources.*;
+import org.springframework.web.bind.annotation.*;
+import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
+
+
 
 @RestController
 public class RouteController {
+	@Autowired
+	private PlanRepository planRepository;
+
+	@Autowired
+	private WorkoutRepository workoutRepository;
+
 		
 	/** 
 	 * Default route. We may or may not find a use
@@ -53,27 +64,18 @@ public class RouteController {
 	 * @return an array of strings representing database rows for workout plans
 	 **/
 	@GetMapping("/getWorkoutPlan")
-	public String getWorkoutPlan(@RequestParam(name="userid",defaultValue="0")int userid) {
-		String sql = "SELECT * FROM WorkoutPlan WHERE UserID = " + userid;
-		return "This will eventually get workout plans for a user by ID.";
+	public List<Plan> getWorkoutPlan(@RequestParam int userID) {
+        return planRepository.findByUserId(userID);
+    }
+
+	@PostMapping("/createWorkoutPlan")
+	public Plan createWorkoutPlan(@RequestBody Plan newPlan) {
+		return planRepository.save(newPlan);
 	}
 
-	/**
-	 * Add information to the workoutplan table.
-	 * @return TRUE if successful, FALSE if there's an issue
-	 **/
-	@GetMapping("/createWorkoutPlan")
-	public boolean createWorkoutPlan(int userid, String arg1, String agr2, String arg3){
-		return false; //There is an issue: this hasn't been implemented yet
-	}
-
-	/**
-	 * Update rows in the workoutplan table.
-	 * @return TRUE if successful, FALSE if there's an issue
-	 **/
-	@GetMapping("/editWorkoutPlan")
-	public boolean editWorkoutPlan(){
-		return false; //There is an issue: this hasn't been implemented yet
+	@PutMapping("/editWorkoutPlan")
+	public Plan editWorkoutPlan(@RequestBody Plan editPlan) {
+		return planRepository.save(editPlan);
 	}
 
 	/**
@@ -89,14 +91,18 @@ public class RouteController {
 	 * @return the requested rows
 	 **/
 	@GetMapping("/getWorkouts")
-	public String getWorkouts(){
-		return "This will eventually let us get a list of possible workouts.";
+	public List<Workout> getWorkouts() {
+		try {
+			System.out.println("📢 Fetching workouts...");
+			List<Workout> workouts = workoutRepository.findAll();
+			System.out.println("✅ Workouts fetched: " + workouts.size());
+			return workouts;
+		} catch (Exception e) {
+			System.err.println("❌ ERROR fetching workouts:");
+			e.printStackTrace(); // will print the real reason in the IntelliJ console
+			throw e;
+		}
 	}
-
-	/**
-	 * Add new workouts to the workouts table.
-	 * @return TRUE if successful, FALSE if not
-	 **/
 	@GetMapping("/addWorkout")
 	public boolean addWorkout(){
 		return false; //not implemented yet so always returns false

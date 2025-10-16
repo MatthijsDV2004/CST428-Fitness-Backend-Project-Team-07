@@ -1,35 +1,57 @@
 package com.example.springboot;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import org.junit.jupiter.api.Test;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+<<<<<<< HEAD
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+=======
+import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.TestPropertySource;
+>>>>>>> origin/main
 
-@SpringBootTest
-@AutoConfigureMockMvc
-public class HelloControllerTest {
+import static org.assertj.core.api.Assertions.assertThat;
 
+<<<<<<< HEAD
 	@Autowired
 	private MockMvc mvc;
 	
 
     @MockBean
     private JdbcTemplate jdbcTemplate;
+=======
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@TestPropertySource(properties = {
+        "spring.autoconfigure.exclude=org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration"
+})
+class HelloControllerTest {
+>>>>>>> origin/main
 
-	@Test
-	public void getHello() throws Exception {
-		mvc.perform(MockMvcRequestBuilders.get("/").accept(MediaType.APPLICATION_JSON))
-				.andExpect(status().isOk())
-				.andExpect(content().string(equalTo("Greetings from Spring Boot!")));
-	}
+    @LocalServerPort
+    private int port;
+
+    @Autowired
+    private TestRestTemplate template;
+
+    // ✅ Mock the repositories that RouteController depends on
+    @MockBean
+    private PlanRepository planRepository;
+
+    @MockBean
+    private WorkoutRepository workoutRepository;
+
+    @Test
+    void getHello() {
+        String url = "http://localhost:" + port + "/";
+        ResponseEntity<String> response = template.getForEntity(url, String.class);
+
+        assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();
+        assertThat(response.getBody()).isEqualTo("This is the basic index route.");
+    }
 }
