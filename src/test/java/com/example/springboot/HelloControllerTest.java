@@ -4,18 +4,34 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+<<<<<<< HEAD
+import org.springframework.http.MediaType;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+=======
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
+>>>>>>> origin/main
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+<<<<<<< HEAD
+	@Autowired
+	private MockMvc mvc;
+	
+
+    @MockBean
+    private JdbcTemplate jdbcTemplate;
+=======
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(properties = {
         "spring.autoconfigure.exclude=org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration"
 })
 class HelloControllerTest {
+>>>>>>> origin/main
 
     @LocalServerPort
     private int port;

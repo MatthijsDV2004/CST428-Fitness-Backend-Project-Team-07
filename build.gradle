@@ -1,22 +1,37 @@
 plugins {
+<<<<<<< HEAD
+    id 'org.springframework.boot' version '3.3.0'
+    id 'io.spring.dependency-management' version '1.1.0'
+    id 'java'
+=======
 	id 'org.springframework.boot' version '3.3.0'
 	id 'io.spring.dependency-management' version '1.1.4'
 	id 'java'
+>>>>>>> origin/main
 }
 
 group = 'com.example'
 version = '0.0.1-SNAPSHOT'
 
 java {
-	sourceCompatibility = JavaVersion.VERSION_17
-	targetCompatibility = JavaVersion.VERSION_17
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
 }
 
 repositories {
-	mavenCentral()
+    mavenCentral()
 }
 
 dependencies {
+<<<<<<< HEAD
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+    implementation 'com.mysql:mysql-connector-j:9.4.0'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'com.h2database:h2'
+=======
 	// tag::actuator[]
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 //	runtimeOnly 'com.h2database:h2'
@@ -28,8 +43,9 @@ dependencies {
 	// tag::tests[]
 	testImplementation('org.springframework.boot:spring-boot-starter-test')
 	// end::tests[]
+>>>>>>> origin/main
 }
 
 test {
-	useJUnitPlatform()
+    useJUnitPlatform()
 }
