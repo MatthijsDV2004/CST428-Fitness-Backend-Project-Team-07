@@ -22,10 +22,10 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-jdbc'
 
-	// ✅ Use PostgreSQL (Heroku's default)
+	// ✅ Heroku Postgres driver
 	runtimeOnly 'org.postgresql:postgresql:42.7.3'
 
-	// Optional local testing database (H2)
+	// Optional local testing DB
 	runtimeOnly 'com.h2database:h2'
 
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
