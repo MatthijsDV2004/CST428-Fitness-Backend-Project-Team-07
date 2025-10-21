@@ -107,12 +107,14 @@ public class RouteController {
 			throw e;
 		}
 	}
+	@CrossOrigin(origins = "*")
 	@GetMapping("/getWorkouts/{id}")
 	public ResponseEntity<Workout> getWorkoutById(@PathVariable Integer id) {
 		Optional<Workout> workout = workoutRepository.findById(id);
 		return workout.map(ResponseEntity::ok)
 				.orElseGet(() -> ResponseEntity.notFound().build());
 	}
+	@CrossOrigin(origins = "*")
 	@GetMapping("/addWorkout")
 	public boolean addWorkout(){
 		return false; //not implemented yet so always returns false
