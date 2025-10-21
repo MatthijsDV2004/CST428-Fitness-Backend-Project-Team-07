@@ -1,4 +1,4 @@
-package com.example.springboot.resources;
+package com.example.springboot.model;
 
 public class DBUser{ 
     private Integer id;
