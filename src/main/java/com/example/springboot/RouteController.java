@@ -3,9 +3,7 @@ package com.example.springboot;
 import org.springframework.jdbc.core.RowMapper;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+
 import com.example.springboot.resources.*;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
@@ -82,10 +80,18 @@ public class RouteController {
 	 * Remove workout plans from the database.
 	 * @return the number of removed rows, -1 if there's an error
 	 **/
-	@GetMapping("/removeWorkoutPlan")
-	public int removeWorkoutPlan(){
-		return -1; //Error: this hasn't been implemented
+	@DeleteMapping("/removeWorkoutPlan")
+	public ResponseEntity<String> removeWorkoutPlan(@RequestBody Plan deletePlan) {
+		try {
+			planRepository.delete(deletePlan);
+			return ResponseEntity.ok("Workout plan deleted successfully");
+		} catch (Exception e) {
+			System.err.println("❌ ERROR deleting workout plan:");
+			e.printStackTrace();
+			throw e;
+		}
 	}
+	
 	/**
 	 * Retrieve workouts from the workouts table.
 	 * @return the requested rows
