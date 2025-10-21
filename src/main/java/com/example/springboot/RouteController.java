@@ -1,14 +1,16 @@
 package com.example.springboot;
 
+import com.example.springboot.model.DBUser;
+import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.RowMapper;
 
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import com.example.springboot.resources.*;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 
 
@@ -104,6 +106,12 @@ public class RouteController {
 			e.printStackTrace(); // will print the real reason in the IntelliJ console
 			throw e;
 		}
+	}
+	@GetMapping("/getWorkouts/{id}")
+	public ResponseEntity<Workout> getWorkoutById(@PathVariable Integer id) {
+		Optional<Workout> workout = workoutRepository.findById(id);
+		return workout.map(ResponseEntity::ok)
+				.orElseGet(() -> ResponseEntity.notFound().build());
 	}
 	@GetMapping("/addWorkout")
 	public boolean addWorkout(){

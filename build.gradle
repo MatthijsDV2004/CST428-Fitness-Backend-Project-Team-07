@@ -23,7 +23,13 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'com.google.api-client:google-api-client:2.2.0'
+	implementation 'com.google.http-client:google-http-client-gson:1.43.3'
 
+	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+	implementation 'io.jsonwebtoken:jjwt-impl:0.11.5'
+	implementation 'io.jsonwebtoken:jjwt-jackson:0.11.5'
 	// ✅ Heroku Postgres driver
 	runtimeOnly 'com.mysql:mysql-connector-j:9.4.0'
 
