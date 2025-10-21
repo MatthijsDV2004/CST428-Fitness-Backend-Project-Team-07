@@ -82,6 +82,7 @@ public class RouteController {
 	 * Remove workout plans from the database.
 	 * @return the number of removed rows, -1 if there's an error
 	 **/
+	@CrossOrigin(origins = "*")
 	@GetMapping("/removeWorkoutPlan")
 	public int removeWorkoutPlan(){
 		return -1; //Error: this hasn't been implemented
@@ -90,6 +91,7 @@ public class RouteController {
 	 * Retrieve workouts from the workouts table.
 	 * @return the requested rows
 	 **/
+	@CrossOrigin(origins = "*")
 	@GetMapping("/getWorkouts")
 	public List<Workout> getWorkouts() {
 		try {
