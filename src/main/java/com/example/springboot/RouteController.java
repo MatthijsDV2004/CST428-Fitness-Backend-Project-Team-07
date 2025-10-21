@@ -93,7 +93,7 @@ public class RouteController {
 	 * Retrieve workouts from the workouts table.
 	 * @return the requested rows
 	 **/
-	@CrossOrigin(origins = "*")
+//	@CrossOrigin(origins = "*")
 	@GetMapping("/getWorkouts")
 	public List<Workout> getWorkouts() {
 		try {
@@ -107,7 +107,7 @@ public class RouteController {
 			throw e;
 		}
 	}
-	@CrossOrigin(origins = "*")
+//	@CrossOrigin(origins = "*")
 	@GetMapping("/getWorkouts/{id}")
 	public ResponseEntity<Workout> getWorkoutById(@PathVariable Integer id) {
 		Optional<Workout> workout = workoutRepository.findById(id);
