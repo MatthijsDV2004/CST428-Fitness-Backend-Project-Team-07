@@ -25,7 +25,7 @@ public class AuthController {
         this.jwtService = jwtService;
     }
 
-    @PostMapping("/api/auth/google")
+    @PostMapping("/google")
     public ResponseEntity<?> verifyGoogleToken(@RequestBody Map<String, String> body) {
         String token = body.get("token");
         GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier
