@@ -25,49 +25,34 @@ public class AuthController {
         this.jwtService = jwtService;
     }
 
-    @PostMapping("/google")
-
-    public ResponseEntity<?> authenticate(@RequestBody Map<String, String> body) {
-        System.out.println("🚀 Entered /api/auth/google endpoint");
-        String idTokenString = body.get("token");
-        System.out.println("✅ Received token: " + (idTokenString != null));
-
-        GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(
-                new NetHttpTransport(),
-                GsonFactory.getDefaultInstance()
-        )
-                .setAudience(Collections.singletonList(
-                        "583541403083-ip677njslglhptvtpq2fshqpv66g3j7q.apps.googleusercontent.com"
-
-                ))
+    @PostMapping("/api/auth/google")
+    public ResponseEntity<?> verifyGoogleToken(@RequestBody Map<String, String> body) {
+        String token = body.get("token");
+        GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier
+                .Builder(new NetHttpTransport(), new GsonFactory())
+                .setAudience(Collections.singletonList("YOUR_GOOGLE_WEB_CLIENT_ID"))
                 .build();
 
         try {
-            System.out.println("⏳ Starting token verification");
-
-            // For testing, skip Google validation if token = "dummy"
-            if ("dummy".equals(idTokenString)) {
-                System.out.println("✅ Skipping real verification (dummy token)");
-                String jwt = jwtService.generateToken("test@example.com");
-                return ResponseEntity.ok(Map.of("access_token", jwt));
+            GoogleIdToken idToken = verifier.verify(token);
+            if (idToken == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Google token");
             }
 
-            GoogleIdToken idToken = verifier.verify(idTokenString);
-            if (idToken != null) {
-                String email = idToken.getPayload().getEmail();
-                System.out.println("✅ Verified Google token for: " + email);
-                String jwt = jwtService.generateToken(email);
-                return ResponseEntity.ok(Map.of("access_token", jwt));
-            } else {
-                System.out.println("❌ Invalid or mismatched ID token");
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                        .body("Invalid ID token");
-            }
+            // Extract user info
+            GoogleIdToken.Payload payload = idToken.getPayload();
+            String email = payload.getEmail();
+            String name = (String) payload.get("name");
+            String pictureUrl = (String) payload.get("picture");
+
+            // Optionally: create your own JWT
+            String jwt = jwtService.generateToken(email);
+
+            return ResponseEntity.ok(Map.of("access_token", jwt));
         } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Verification error: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token verification failed");
         }
     }
+
 }
 
