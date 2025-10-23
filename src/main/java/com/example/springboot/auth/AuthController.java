@@ -30,7 +30,7 @@ public class AuthController {
         String token = body.get("token");
         GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier
                 .Builder(new NetHttpTransport(), new GsonFactory())
-                .setAudience(Collections.singletonList("YOUR_GOOGLE_WEB_CLIENT_ID"))
+                .setAudience(Collections.singletonList("583541403083-ip677njslglhptvtpq2fshqpv66g3j7q.apps.googleusercontent.com"))
                 .build();
 
         try {
