@@ -7,4 +7,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface WorkoutRepository extends JpaRepository<Workout, Integer> {
     List<Workout> findByWorkoutNameStartingWithIgnoreCase(String name);
+    List<Workout> findByMuscleGroupIgnoreCase(String muscle);
+    List<Workout> findByWorkoutNameStartingWithIgnoreCaseAndMuscleGroupIgnoreCase(String name, String muscle);
+
 }

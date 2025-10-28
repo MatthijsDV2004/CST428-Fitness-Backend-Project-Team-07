@@ -177,24 +177,18 @@ public class RouteController {
 	}
 
 	@GetMapping("/getWorkouts")
-	public List<Workout> getWorkouts(@RequestParam(required = false) String name) {
-		try {
-			System.out.println("📢 Fetching workouts...");
+	public List<Workout> getWorkouts(
+			@RequestParam(required = false) String name,
+			@RequestParam(required = false) String muscle) {
 
-			List<Workout> workouts;
-			if (name != null && !name.isBlank()) {
-				workouts = workoutRepository.findByWorkoutNameStartingWithIgnoreCase(name);
-				System.out.println("✅ Filtered workouts starting with: " + name + " → " + workouts.size());
-			} else {
-				workouts = workoutRepository.findAll();
-				System.out.println("✅ All workouts fetched: " + workouts.size());
-			}
-
-			return workouts;
-		} catch (Exception e) {
-			System.err.println("❌ ERROR fetching workouts:");
-			e.printStackTrace();
-			throw e;
+		if (name != null && !name.isBlank() && muscle != null && !muscle.isBlank()) {
+			return workoutRepository.findByWorkoutNameStartingWithIgnoreCaseAndMuscleGroupIgnoreCase(name, muscle);
+		} else if (name != null && !name.isBlank()) {
+			return workoutRepository.findByWorkoutNameStartingWithIgnoreCase(name);
+		} else if (muscle != null && !muscle.isBlank()) {
+			return workoutRepository.findByMuscleGroupIgnoreCase(muscle);
+		} else {
+			return workoutRepository.findAll();
 		}
 	}
 
