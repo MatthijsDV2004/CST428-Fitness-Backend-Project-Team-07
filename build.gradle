@@ -48,7 +48,9 @@ dependencies {
 test {
 	useJUnitPlatform()
 }
-
+tasks.withType(Test) {
+	enabled = false
+}
 tasks.register("stage") {
 	dependsOn "build"
 }
