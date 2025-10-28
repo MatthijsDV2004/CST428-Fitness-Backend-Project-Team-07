@@ -177,9 +177,25 @@ public class RouteController {
 	}
 
 	@GetMapping("/getWorkouts")
-	public List<Workout> getWorkouts() {
-		List<Workout> workouts = workoutRepository.findAll();
-		return workouts;
+	public List<Workout> getWorkouts(@RequestParam(required = false) String name) {
+		try {
+			System.out.println("📢 Fetching workouts...");
+
+			List<Workout> workouts;
+			if (name != null && !name.isBlank()) {
+				workouts = workoutRepository.findByWorkoutNameStartingWithIgnoreCase(name);
+				System.out.println("✅ Filtered workouts starting with: " + name + " → " + workouts.size());
+			} else {
+				workouts = workoutRepository.findAll();
+				System.out.println("✅ All workouts fetched: " + workouts.size());
+			}
+
+			return workouts;
+		} catch (Exception e) {
+			System.err.println("❌ ERROR fetching workouts:");
+			e.printStackTrace();
+			throw e;
+		}
 	}
 
 	@GetMapping("/getWorkouts/{id}")
