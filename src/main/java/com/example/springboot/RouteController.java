@@ -6,9 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 @RequestMapping
@@ -16,6 +14,9 @@ public class RouteController {
 
 	@Autowired
 	private PlanRepository planRepository;
+
+	@Autowired
+	private PlanItemRepository planItemRepository;
 
 	@Autowired
 	private WorkoutRepository workoutRepository;
@@ -54,12 +55,58 @@ public class RouteController {
 
 		System.out.println("Adding exercise " + name + " (" + sets + "x" + reps + ") to plan ID " + planId);
 
-		// TODO: save this exercise to your DB (create PlanItem entity later)
+		// Find workout by name
+		var workoutOpt = workoutRepository.findAll()
+				.stream()
+				.filter(w -> w.getWorkoutName().equalsIgnoreCase(name))
+				.findFirst();
+
+		Integer workoutId = workoutOpt.map(w -> w.getWorkoutID()).orElse(null);
+
+		if (workoutId == null) {
+			return ResponseEntity.badRequest().body("Workout not found: " + name);
+		}
+
+		// Create and save PlanItem
+		PlanItem planItem = new PlanItem(planId, workoutId, "Default", sets, reps);
+		planItemRepository.save(planItem);
+
 		return ResponseEntity.ok("Exercise added to plan " + planId);
 	}
+	@DeleteMapping("/plans/{planId}/exercise/{name}")
+	public ResponseEntity<String> deleteExercise(
+			@PathVariable Long planId,
+			@PathVariable String name) {
+		// delete DB record
+		return ResponseEntity.ok("Exercise deleted");
+	}
+	@PutMapping("/plans/{planId}/exercise/{name}")
+	public ResponseEntity<String> updateExercise(
+			@PathVariable Long planId,
+			@PathVariable String name,
+			@RequestBody Map<String, Object> body) {
+		Integer sets = (Integer) body.get("sets");
+		Integer reps = (Integer) body.get("reps");
+		// update DB record here
+		return ResponseEntity.ok("Exercise updated");
+	}
 	@GetMapping("/plans/day")
-	public List<Plan> getPlansByDay(@RequestParam String googleId, @RequestParam String day) {
-		return planRepository.findByGoogleIdAndDay(googleId, day);
+	public List<Map<String, Object>> getPlansByDay(@RequestParam String googleId, @RequestParam String day) {
+		List<Plan> plans = planRepository.findByGoogleIdAndDay(googleId, day);
+		List<Map<String, Object>> enrichedPlans = new ArrayList<>();
+
+		for (Plan plan : plans) {
+			List<PlanItem> items = planItemRepository.findByPlanId(plan.getId());
+			Map<String, Object> data = new HashMap<>();
+			data.put("id", plan.getId());
+			data.put("googleId", plan.getGoogleId());
+			data.put("name", plan.getName());
+			data.put("day", plan.getDay());
+			data.put("exercises", items);
+			enrichedPlans.add(data);
+		}
+
+		return enrichedPlans;
 	}
 
 	@PostMapping("/plans")
