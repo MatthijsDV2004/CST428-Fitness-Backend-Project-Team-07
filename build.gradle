@@ -30,6 +30,10 @@ dependencies {
 	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
 	implementation 'io.jsonwebtoken:jjwt-impl:0.11.5'
 	implementation 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+	testImplementation 'io.rest-assured:rest-assured:5.4.0'
+	testImplementation 'org.hamcrest:hamcrest:2.2'
+	testRuntimeOnly 'com.h2database:h2'
+
 
 	// ✅ Correct MySQL connector version for Heroku ClearDB
 	runtimeOnly 'com.mysql:mysql-connector-j:8.4.0'
@@ -41,10 +45,9 @@ dependencies {
 }
 
 
-//test {
-//	useJUnitPlatform()
-//	enabled = false
-//}
+test {
+	useJUnitPlatform()
+}
 
 tasks.register("stage") {
 	dependsOn "build"
