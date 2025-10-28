@@ -11,7 +11,6 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping
-@CrossOrigin(origins = "*")
 public class RouteController {
 
 	@Autowired
@@ -80,12 +79,12 @@ public class RouteController {
 	@GetMapping("/getWorkouts")
 	public List<Workout> getWorkouts() {
 		try {
-			System.out.println("📢 Fetching workouts...");
+			System.out.println("Fetching workouts...");
 			List<Workout> workouts = workoutRepository.findAll();
-			System.out.println("✅ Workouts fetched: " + workouts.size());
+			System.out.println("Workouts fetched: " + workouts.size());
 			return workouts;
 		} catch (Exception e) {
-			System.err.println("❌ ERROR fetching workouts:");
+			System.err.println("ERROR fetching workouts:");
 			e.printStackTrace();
 			throw e;
 		}
