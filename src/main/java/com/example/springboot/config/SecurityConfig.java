@@ -22,13 +22,15 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**", "/getWorkouts/**", "/ping").permitAll()
+                        .requestMatchers("/api/auth/**",
+                                "/ping"
+                            ).permitAll()
                         .anyRequest().authenticated()
                 )
-                // ✅ Let Spring validate JWTs automatically
+      
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(jwt -> jwt
-                                .jwkSetUri("https://www.googleapis.com/oauth2/v3/certs") // Google’s public keys
+                                .jwkSetUri("https://www.googleapis.com/oauth2/v3/certs")
                         )
                 );
 
