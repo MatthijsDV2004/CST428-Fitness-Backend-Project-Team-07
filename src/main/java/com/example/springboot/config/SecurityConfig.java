@@ -16,13 +16,8 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**",
-                                "/getWorkouts/**",
-                                "/ping",
-                                "/plans/**",
-                                "/getUserById",
-                                "/createWorkoutPlan",
-                                "/editWorkoutPlan",
-                                "/removeWorkoutPlan").permitAll()
+                                "/ping"
+                            ).permitAll()
                         .anyRequest().authenticated()
                 )
       
