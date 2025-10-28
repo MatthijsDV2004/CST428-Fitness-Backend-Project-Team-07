@@ -44,52 +44,7 @@ public class RouteController {
 	public List<Plan> getPlans(@RequestParam String googleId) {
 		return planRepository.findByGoogleId(googleId);
 	}
-	@PostMapping("/plans/{planId}/addExercise")
-	public ResponseEntity<String> addExerciseToPlan(
-			@PathVariable Long planId,
-			@RequestBody Map<String, Object> exerciseData) {
 
-		String name = (String) exerciseData.get("name");
-		Integer sets = (Integer) exerciseData.get("sets");
-		Integer reps = (Integer) exerciseData.get("reps");
-
-		System.out.println("Adding exercise " + name + " (" + sets + "x" + reps + ") to plan ID " + planId);
-
-		// Find workout by name
-		var workoutOpt = workoutRepository.findAll()
-				.stream()
-				.filter(w -> w.getWorkoutName().equalsIgnoreCase(name))
-				.findFirst();
-
-		Integer workoutId = workoutOpt.map(w -> w.getWorkoutID()).orElse(null);
-
-		if (workoutId == null) {
-			return ResponseEntity.badRequest().body("Workout not found: " + name);
-		}
-
-		// Create and save PlanItem
-		PlanItem planItem = new PlanItem(planId, workoutId, "Default", sets, reps);
-		planItemRepository.save(planItem);
-
-		return ResponseEntity.ok("Exercise added to plan " + planId);
-	}
-	@DeleteMapping("/plans/{planId}/exercise/{name}")
-	public ResponseEntity<String> deleteExercise(
-			@PathVariable Long planId,
-			@PathVariable String name) {
-		// delete DB record
-		return ResponseEntity.ok("Exercise deleted");
-	}
-	@PutMapping("/plans/{planId}/exercise/{name}")
-	public ResponseEntity<String> updateExercise(
-			@PathVariable Long planId,
-			@PathVariable String name,
-			@RequestBody Map<String, Object> body) {
-		Integer sets = (Integer) body.get("sets");
-		Integer reps = (Integer) body.get("reps");
-		// update DB record here
-		return ResponseEntity.ok("Exercise updated");
-	}
 	@GetMapping("/plans/day")
 	public List<Map<String, Object>> getPlansByDay(@RequestParam String googleId, @RequestParam String day) {
 		List<Plan> plans = planRepository.findByGoogleIdAndDay(googleId, day);
@@ -97,13 +52,31 @@ public class RouteController {
 
 		for (Plan plan : plans) {
 			List<PlanItem> items = planItemRepository.findByPlanId(plan.getId());
-			Map<String, Object> data = new HashMap<>();
-			data.put("id", plan.getId());
-			data.put("googleId", plan.getGoogleId());
-			data.put("name", plan.getName());
-			data.put("day", plan.getDay());
-			data.put("exercises", items);
-			enrichedPlans.add(data);
+			List<Map<String, Object>> exercises = new ArrayList<>();
+
+			for (PlanItem item : items) {
+				Map<String, Object> exercise = new HashMap<>();
+				exercise.put("id", item.getId());
+				exercise.put("sets", item.getSets());
+				exercise.put("reps", item.getReps());
+				exercise.put("day", item.getDay());
+				exercise.put("workoutId", item.getWorkoutId());
+
+				workoutRepository.findById(item.getWorkoutId()).ifPresent(workout ->
+						exercise.put("name", workout.getWorkoutName())
+				);
+
+				exercises.add(exercise);
+			}
+
+			Map<String, Object> planData = new HashMap<>();
+			planData.put("id", plan.getId());
+			planData.put("googleId", plan.getGoogleId());
+			planData.put("name", plan.getName());
+			planData.put("day", plan.getDay());
+			planData.put("exercises", exercises);
+
+			enrichedPlans.add(planData);
 		}
 
 		return enrichedPlans;
@@ -116,16 +89,15 @@ public class RouteController {
 
 	@PutMapping("/plans/{id}")
 	public ResponseEntity<Plan> updatePlan(@PathVariable Long id, @RequestBody Plan updatedPlan) {
-		Optional<Plan> optionalPlan = planRepository.findById(id);
-		if (optionalPlan.isEmpty()) {
-			return ResponseEntity.notFound().build();
-		}
-		Plan plan = optionalPlan.get();
-		plan.setName(updatedPlan.getName());
-		plan.setDay(updatedPlan.getDay());
-		plan.setGoogleId(updatedPlan.getGoogleId());
-		planRepository.save(plan);
-		return ResponseEntity.ok(plan);
+		return planRepository.findById(id)
+				.map(plan -> {
+					plan.setName(updatedPlan.getName());
+					plan.setDay(updatedPlan.getDay());
+					plan.setGoogleId(updatedPlan.getGoogleId());
+					planRepository.save(plan);
+					return ResponseEntity.ok(plan);
+				})
+				.orElseGet(() -> ResponseEntity.notFound().build());
 	}
 
 	@DeleteMapping("/plans/{id}")
@@ -137,18 +109,77 @@ public class RouteController {
 		return ResponseEntity.notFound().build();
 	}
 
+	@PostMapping("/plans/{planId}/addExercise")
+	public ResponseEntity<String> addExerciseToPlan(@PathVariable Long planId, @RequestBody Map<String, Object> exerciseData) {
+		String name = (String) exerciseData.get("name");
+		Integer sets = (Integer) exerciseData.get("sets");
+		Integer reps = (Integer) exerciseData.get("reps");
+
+		var workoutOpt = workoutRepository.findAll()
+				.stream()
+				.filter(w -> w.getWorkoutName().equalsIgnoreCase(name))
+				.findFirst();
+
+		Integer workoutId = workoutOpt.map(Workout::getWorkoutID).orElse(null);
+		if (workoutId == null) return ResponseEntity.badRequest().body("Workout not found: " + name);
+
+		PlanItem planItem = new PlanItem(planId, workoutId, "Default", sets, reps);
+		planItemRepository.save(planItem);
+
+		return ResponseEntity.ok("Exercise added to plan " + planId);
+	}
+
+	@PutMapping("/plans/{planId}/exercise/{name}")
+	public ResponseEntity<String> updateExercise(@PathVariable Long planId, @PathVariable String name, @RequestBody Map<String, Object> body) {
+		Integer sets = (Integer) body.get("sets");
+		Integer reps = (Integer) body.get("reps");
+
+		var workoutOpt = workoutRepository.findAll()
+				.stream()
+				.filter(w -> w.getWorkoutName().equalsIgnoreCase(name))
+				.findFirst();
+
+		Integer workoutId = workoutOpt.map(Workout::getWorkoutID).orElse(null);
+		if (workoutId == null) return ResponseEntity.badRequest().body("Workout not found: " + name);
+
+		List<PlanItem> items = planItemRepository.findByPlanId(planId);
+		for (PlanItem item : items) {
+			if (Objects.equals(item.getWorkoutId(), workoutId)) {
+				item.setSets(sets);
+				item.setReps(reps);
+				planItemRepository.save(item);
+				return ResponseEntity.ok("Exercise updated");
+			}
+		}
+
+		return ResponseEntity.notFound().build();
+	}
+
+	@DeleteMapping("/plans/{planId}/exercise/{name}")
+	public ResponseEntity<String> deleteExercise(@PathVariable Long planId, @PathVariable String name) {
+		var workoutOpt = workoutRepository.findAll()
+				.stream()
+				.filter(w -> w.getWorkoutName().equalsIgnoreCase(name))
+				.findFirst();
+
+		Integer workoutId = workoutOpt.map(Workout::getWorkoutID).orElse(null);
+		if (workoutId == null) return ResponseEntity.badRequest().body("Workout not found: " + name);
+
+		List<PlanItem> items = planItemRepository.findByPlanId(planId);
+		for (PlanItem item : items) {
+			if (Objects.equals(item.getWorkoutId(), workoutId)) {
+				planItemRepository.delete(item);
+				return ResponseEntity.ok("Exercise deleted");
+			}
+		}
+
+		return ResponseEntity.notFound().build();
+	}
+
 	@GetMapping("/getWorkouts")
 	public List<Workout> getWorkouts() {
-		try {
-			System.out.println("Fetching workouts...");
-			List<Workout> workouts = workoutRepository.findAll();
-			System.out.println("Workouts fetched: " + workouts.size());
-			return workouts;
-		} catch (Exception e) {
-			System.err.println("ERROR fetching workouts:");
-			e.printStackTrace();
-			throw e;
-		}
+		List<Workout> workouts = workoutRepository.findAll();
+		return workouts;
 	}
 
 	@GetMapping("/getWorkouts/{id}")
