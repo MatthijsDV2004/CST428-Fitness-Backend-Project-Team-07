@@ -65,44 +65,55 @@ public class RouteController {
 	 * Return information from the workoutplan table.
 	 * @return an array of strings representing database rows for workout plans
 	 **/
-	@GetMapping("/getWorkoutPlan")
-	public List<Plan> getWorkoutPlan(@RequestParam int userID) {
-        return planRepository.findByUserId(userID);
-    }
+	public List<Plan> getPlans(@RequestParam String googleId) {
+		return planRepository.findByGoogleId(googleId);
+	}
 
-	@PostMapping("/createWorkoutPlan")
-	public Plan createWorkoutPlan(@RequestBody Plan newPlan) {
+
+	@GetMapping("/day")
+	public List<Plan> getPlansByDay(@RequestParam String googleId, @RequestParam String day) {
+		return planRepository.findByGoogleIdAndDay(googleId, day);
+	}
+
+
+	@PostMapping
+	public Plan createPlan(@RequestBody Plan newPlan) {
 		return planRepository.save(newPlan);
 	}
 
-	@PutMapping("/editWorkoutPlan")
-	public Plan editWorkoutPlan(@RequestBody Plan editPlan) {
-		return planRepository.save(editPlan);
+	@PutMapping("/{id}")
+	public ResponseEntity<Plan> updatePlan(@PathVariable Long id, @RequestBody Plan updatedPlan) {
+		Optional<Plan> optionalPlan = planRepository.findById(id);
+		if (optionalPlan.isEmpty()) {
+			return ResponseEntity.notFound().build();
+		}
+		Plan plan = optionalPlan.get();
+		plan.setName(updatedPlan.getName());
+		plan.setDay(updatedPlan.getDay());
+		plan.setGoogleId(updatedPlan.getGoogleId());
+		planRepository.save(plan);
+		return ResponseEntity.ok(plan);
 	}
 
-	/**
-	 * Remove workout plans from the database.
-	 * @return the number of removed rows, -1 if there's an error
-	 **/
-	@CrossOrigin(origins = "*")
-	@GetMapping("/removeWorkoutPlan")
-	public int removeWorkoutPlan(){
-		return -1; //Error: this hasn't been implemented
+
+	@DeleteMapping("/{id}")
+	public ResponseEntity<Void> deletePlan(@PathVariable Long id) {
+		if (planRepository.existsById(id)) {
+			planRepository.deleteById(id);
+			return ResponseEntity.noContent().build();
+		}
+		return ResponseEntity.notFound().build();
 	}
-	/**
-	 * Retrieve workouts from the workouts table.
-	 * @return the requested rows
-	 **/
-//	@CrossOrigin(origins = "*")
+
 	@GetMapping("/getWorkouts")
 	public List<Workout> getWorkouts() {
 		try {
 			System.out.println("📢 Fetching workouts...");
 			List<Workout> workouts = workoutRepository.findAll();
-			System.out.println("✅ Workouts fetched: " + workouts.size());
+			System.out.println(" Workouts fetched: " + workouts.size());
 			return workouts;
 		} catch (Exception e) {
-			System.err.println("❌ ERROR fetching workouts:");
+			System.err.println(" ERROR fetching workouts:");
 			e.printStackTrace(); // will print the real reason in the IntelliJ console
 			throw e;
 		}
