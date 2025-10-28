@@ -7,6 +7,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -42,7 +43,20 @@ public class RouteController {
 	public List<Plan> getPlans(@RequestParam String googleId) {
 		return planRepository.findByGoogleId(googleId);
 	}
+	@PostMapping("/plans/{planId}/addExercise")
+	public ResponseEntity<String> addExerciseToPlan(
+			@PathVariable Long planId,
+			@RequestBody Map<String, Object> exerciseData) {
 
+		String name = (String) exerciseData.get("name");
+		Integer sets = (Integer) exerciseData.get("sets");
+		Integer reps = (Integer) exerciseData.get("reps");
+
+		System.out.println("Adding exercise " + name + " (" + sets + "x" + reps + ") to plan ID " + planId);
+
+		// TODO: save this exercise to your DB (create PlanItem entity later)
+		return ResponseEntity.ok("Exercise added to plan " + planId);
+	}
 	@GetMapping("/plans/day")
 	public List<Plan> getPlansByDay(@RequestParam String googleId, @RequestParam String day) {
 		return planRepository.findByGoogleIdAndDay(googleId, day);
